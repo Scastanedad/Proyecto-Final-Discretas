@@ -6,7 +6,7 @@ Entrada : datos/crudos/dengue_atlantico_2018_2025.csv   (un caso por fila, ver 0
 Salida  : datos/procesados/casos_mun_periodo.csv
           columnas: anio, periodo, cod_mun, municipio, casos   (23 x 13 x 8 = 2.392 filas)
 
-Decisiones (ver BITACORA.md):
+Decisiones:
   * Cada caso se ubica en la semana epidemiológica de su INICIO DE SÍNTOMAS (INI_SIN),
     no en la de notificación, porque refleja cuándo ocurrió el contagio.
   * Semana epidemiológica: inicia el domingo; la semana 1 es la que contiene el 4 de enero

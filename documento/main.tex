@@ -50,9 +50,8 @@
 con un grafo de municipios vecinos y una red neuronal\par}
 \vspace{2cm}
 {Samuel Castañeda\\
-{[Integrante 2]}\\
-{[Integrante 3]}\\
-{[Integrante 4]}\par}
+{Amir Diago}\\
+{Andrés Mendible}\\}
 \vspace{1cm}
 {Departamento de Matemáticas y Estadística, Universidad del Norte\par}
 \vspace{0.4cm}
@@ -61,6 +60,8 @@ con un grafo de municipios vecinos y una red neuronal\par}
 {MSc. Iván Gómez\par}
 \vspace{0.4cm}
 {15 de noviembre de 2026\par}
+\vspace{1.2cm}
+{\small Repositorio del proyecto: \url{https://github.com/Scastanedad/Proyecto-Final-Discretas}\par}
 \end{titlepage}
 
 % ======================== RESUMEN ===================================
@@ -112,7 +113,7 @@ Se puede modelar & Grafo ponderado de municipios (vecindad, gravedad, centralida
 \section{Modelación con la teoría del curso}
 
 \subsection{Datos}
-Todos los datos son reales y públicos (Tabla~\ref{tab:datos}). La unidad de tiempo es el \emph{periodo epidemiológico} del Instituto Nacional de Salud: cuatro semanas, trece por año. Con semanas sueltas, el 66\,\% de las combinaciones municipio–semana tenían cero casos. Con periodos de cuatro semanas, esa proporción baja al 35\,\%.
+Todos los datos son reales y públicos (Tabla~\ref{tab:datos}). La unidad de tiempo es el \emph{periodo epidemiológico} del Instituto Nacional de Salud: cuatro semanas, trece por año. Con semanas sueltas, el 57\,\% de las combinaciones municipio–semana tenían cero casos. Con periodos de cuatro semanas, esa proporción baja al 35\,\%.
 
 \begin{table}[H]
 \centering\small
@@ -122,7 +123,7 @@ Todos los datos son reales y públicos (Tabla~\ref{tab:datos}). La unidad de tie
 \toprule
 Dato & Fuente y procesamiento & Tamaño \\
 \midrule
-Casos de dengue & SIVIGILA, evento 210, 2018--2025 \citep{sivigila}. Filtro: departamento de ocurrencia = Atlántico (código 08). Cada caso se ubica en la semana de \emph{inicio de síntomas}. & 49.308 casos \\
+Casos de dengue & SIVIGILA, evento 210, 2018--2025 \citep{sivigila}. Filtro: departamento de ocurrencia = Atlántico (código 08). Cada caso se ubica en la semana de \emph{inicio de síntomas}. & 49.308 casos notificados \\
 Población & Proyecciones municipales del DANE, actualización post-COVID \citep{dane_pob}. & 23 × 8 años \\
 Límites municipales & Marco Geoestadístico Nacional 2018 \citep{dane_mgn}. & 23 polígonos \\
 Coordenadas & Cabeceras municipales, DIVIPOLA \citep{dane_divipola}. & 23 puntos \\
@@ -131,7 +132,7 @@ Clima diario & Open-Meteo, modelo ECMWF IFS de 9 km \citep{openmeteo}: lluvia, t
 \end{tabularx}
 \end{table}
 
-\noindent Resultado: un panel de $23 \times 13 \times 8 = 2.392$ filas (municipio, periodo), con casos, incidencia por cien mil habitantes y clima.
+\noindent De los 49.308 casos notificados se excluyen 23 cuyo municipio de ocurrencia es desconocido; no hubo casos descartados. Resultado: un panel de $23 \times 13 \times 8 = 2.392$ filas (municipio, periodo), con 49.285 casos, incidencia por cien mil habitantes y clima. Las cifras por municipio y por año que aparecen más adelante salen de este panel.
 
 \subsection{El grafo de municipios}
 Se define el grafo no dirigido y ponderado $G=(V,E,w)$:
@@ -183,7 +184,7 @@ La arquitectura es $14 \to 16 \to 8 \to 1$:
 \end{equation}
 con $\mathrm{ReLU}(z)=\max(0,z)$ y $\sigma(z)=1/(1+e^{-z})$. Los pesos se ajustan minimizando la entropía cruzada con regularización $L_2$,
 \begin{equation}
-  \mathcal{L} = -\frac{1}{N}\sum_{i=1}^N \big[y_i\log\hat y_i + (1-y_i)\log(1-\hat y_i)\big] + \alpha\lVert W\rVert_2^2,
+  \mathcal{L} = -\frac{1}{N}\sum_{i=1}^N \big[y_i\log\hat y_i + (1-y_i)\log(1-\hat y_i)\big] + \frac{\alpha}{2N}\lVert W\rVert_2^2,
   \qquad \alpha = 0{,}01,
 \end{equation}
 mediante retropropagación y el optimizador Adam, con parada temprana \citep{pedregosa2011}. La red predice $\hat y\in(0,1)$, y se emite una alerta cuando $\hat y$ supera un umbral $\tau$ (Sección~\ref{sec:decisiones}).
@@ -214,7 +215,7 @@ $B(v)\leftarrow 0$ para todo $v$\;
 \end{algorithm}
 
 \subsection{Flujo de datos}
-El ejecutable consta de siete scripts de Python que se corren en orden (Tabla~\ref{tab:scripts}). Las instrucciones están en el archivo \texttt{README.md}.
+El ejecutable consta de siete scripts de Python que se corren en orden (Tabla~\ref{tab:scripts}), más un paso opcional (\texttt{00\_extraer\_sivigila.py}) que convierte los Excel descargados del SIVIGILA en el archivo de casos. El código, los datos y las instrucciones de ejecución (archivo \texttt{README.md}) están en el repositorio \url{https://github.com/Scastanedad/Proyecto-Final-Discretas}.
 
 \begin{table}[H]
 \centering\small
@@ -224,6 +225,7 @@ El ejecutable consta de siete scripts de Python que se corren en orden (Tabla~\r
 \toprule
 Script & Función \\
 \midrule
+\texttt{00\_extraer\_sivigila.py} (opcional) & Extrae del Excel del SIVIGILA los casos del Atlántico. \\
 \texttt{01\_casos.py} & Semana epidemiológica de cada caso y conteo por municipio y periodo. \\
 \texttt{02\_poblacion\_clima.py} & Población, clima por periodo y anomalía de lluvia. \\
 \texttt{03\_grafo.py} & Aristas desde los polígonos, pesos de gravedad, centralidades y presión de vecinos. \\
@@ -239,7 +241,7 @@ Script & Función \\
 \begin{enumerate}[label=\alph*)]
   \item \textbf{División temporal, nunca aleatoria.} Cada fila se asigna según el año del periodo objetivo. Entrenamiento: 2018, 2019, 2021, 2022 y 2023 (1.403 filas, 15,5\,\% de brotes). Validación: 2024 (299 filas, 18,4\,\%). Prueba: 2025 (299 filas, 33,4\,\%). Así el modelo nunca ve el futuro.
   \item \textbf{Exclusión de 2020.} Desde marzo de 2020 los casos se desplomaron (Barranquilla pasó de 461 a entre 9 y 27 casos por periodo). Esto se interpreta como subregistro por la pandemia de COVID-19, no como ausencia de dengue. 2020 se excluye del entrenamiento y del cálculo de umbrales. 2021 se conserva porque tuvo un brote real a fin de año. Los rezagos se calculan antes de excluir 2020, para no romper la serie.
-  \item \textbf{Desbalance de clases.} En el entrenamiento se repiten al azar los ejemplos de brote hasta igualar a los de no brote (sobremuestreo).
+  \item \textbf{Desbalance de clases.} En el entrenamiento se repiten al azar los ejemplos de brote hasta igualar a los de no brote (sobremuestreo). La regresión logística usa pesos de clase balanceados, que es equivalente.
   \item \textbf{Umbral en validación con F2.} El umbral $\tau$ se elige en 2024 maximizando $F_2 = 5PS/(4P+S)$, que pondera la sensibilidad $S$ el doble que la precisión $P$: no detectar un brote es peor que una falsa alarma. El conjunto de prueba se usa una sola vez.
   \item \textbf{Variabilidad.} La red se entrena con 20 semillas aleatorias y se reporta media $\pm$ desviación estándar.
 \end{enumerate}
@@ -292,7 +294,7 @@ Intermediación & 3 & 1 & 1 & 0 & 0 \\
 \section{Resultados e interpretación}
 
 \subsection{El dengue sigue a la lluvia con retraso}
-Los casos varían mucho entre años (Figura~\ref{fig:anios}). 2022 fue el año más lluvioso, con 153\,mm por periodo en promedio, y también el de más casos (10.148). Dentro del año, la lluvia sube desde el periodo 5 (mayo), mientras que la incidencia sube desde el periodo 7 y llega al máximo en los periodos 12 y 13, es decir, entre noviembre y enero (Figura~\ref{fig:estacion}). La correlación de Spearman entre la lluvia y la incidencia es casi nula sin rezago ($\rho=0{,}06$), pero sube a $0{,}21$, $0{,}30$ y $0{,}29$ con uno, dos y tres periodos de rezago. Esto coincide con el ciclo del mosquito: tras las lluvias aumentan los criaderos, y la transmisión crece semanas después \citep{morin2013}. Por eso la red recibe la lluvia rezagada hasta $t-3$.
+Los casos varían mucho entre años (Figura~\ref{fig:anios}). 2022 fue el año más lluvioso, con 153\,mm por periodo en promedio, y también el de más casos (10.148). Dentro del año, la lluvia sube desde el periodo 5 (mayo), mientras que la incidencia sube desde el periodo 7 y llega al máximo en los periodos 12 y 13, es decir, entre noviembre y diciembre (Figura~\ref{fig:estacion}). La correlación de Spearman entre la lluvia y la incidencia es casi nula sin rezago ($\rho=0{,}06$), pero sube a $0{,}21$, $0{,}30$ y $0{,}29$ con uno, dos y tres periodos de rezago. Esto coincide con el ciclo del mosquito: tras las lluvias aumentan los criaderos, y la transmisión crece semanas después \citep{morin2013}. Por eso la red recibe la lluvia rezagada hasta $t-3$.
 
 \begin{figure}[H]
 \centering
@@ -371,7 +373,7 @@ Red con grafo & \textbf{0,88} $\pm$ 0,06 & 0,51 $\pm$ 0,05 & \textbf{0,77} $\pm$
 \begin{enumerate}[label=\arabic*.]
   \item \textbf{Los modelos aprendidos superan a la persistencia.} Detectan entre el 85 y el 88\,\% de los brotes, frente al 68\,\%, y tienen mejor AUC. El costo es más falsas alarmas: la precisión baja de 0,72 a cerca de 0,50, algo esperable cuando el umbral se elige privilegiando la sensibilidad. En términos prácticos, por cada brote real se fumigaría también un municipio que no lo iba a tener.
   \item \textbf{La red no supera a la regresión logística.} Con unas 1.400 filas de entrenamiento no hay datos suficientes para que la red aproveche relaciones no lineales. Las dos son equivalentes dentro de la variabilidad entre semillas.
-  \item \textbf{La presión de los vecinos no mejora la predicción.} La diferencia entre la red con grafo y la red sin grafo es de $-0{,}005\pm0{,}031$ en AUC-PR, $-0{,}006\pm0{,}016$ en AUC-ROC y $-0{,}007\pm0{,}027$ en $F_2$; la versión con grafo solo gana en 7 de 20 semillas. Se evaluó también la hipótesis de que el grafo ayudaría en los municipios con pocos datos, pero tampoco se confirmó (Tabla~\ref{tab:grupos}).
+  \item \textbf{La presión de los vecinos no mejora la predicción.} La diferencia entre la red con grafo y la red sin grafo es de $-0{,}005\pm0{,}031$ en AUC-PR, $-0{,}006\pm0{,}016$ en AUC-ROC y $-0{,}007\pm0{,}027$ en $F_2$; la versión con grafo solo gana en 7 de 20 semillas en AUC-PR. Se evaluó también la hipótesis de que el grafo ayudaría en los municipios con pocos datos, pero tampoco se confirmó (Tabla~\ref{tab:grupos}).
 \end{enumerate}
 
 \begin{table}[H]
@@ -504,9 +506,14 @@ Zippenfenig, P. (2023). \emph{Open-Meteo.com Weather API} [Software]. Zenodo. \u
 % ======================== APÉNDICE ==================================
 \appendix
 \section{Reproducibilidad}
-El código, los datos y las instrucciones están en la carpeta del proyecto. Para reproducir todos los resultados:
+El código fuente, los datos y las instrucciones están en el repositorio público
+\begin{center}\url{https://github.com/Scastanedad/Proyecto-Final-Discretas}\end{center}
+Para reproducir todos los resultados, después de clonarlo:
 \begin{verbatim}
+git clone https://github.com/Scastanedad/Proyecto-Final-Discretas.git
+cd Proyecto-Final-Discretas
 pip install -r requirements.txt
+python src/00_extraer_sivigila.py   # opcional: requiere los Excel originales
 python src/01_casos.py
 python src/02_poblacion_clima.py
 python src/03_grafo.py
@@ -518,6 +525,6 @@ python tests/test_semana_epi.py
 python tests/test_grafo.py
 python tests/test_dataset.py
 \end{verbatim}
-El registro completo de decisiones está en \texttt{BITACORA.md}.
+Los resultados numéricos del documento quedan en la carpeta \texttt{resultados/}.
 
 \end{document}

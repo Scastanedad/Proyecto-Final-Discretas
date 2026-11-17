@@ -31,7 +31,7 @@ def _cargar(n, f):
     s = importlib.util.spec_from_file_location(n, RAIZ / "src" / f); m = importlib.util.module_from_spec(s)
     s.loader.exec_module(m); return m
 ds, md = _cargar("ds", "04_dataset.py"), _cargar("md", "05_modelo.py")
-DENSOS = {8001, 8758, 8433, 8638, 8296, 8078}   # ≤ 12 % de periodos sin casos (ver BITACORA, paso 1)
+DENSOS = {8001, 8758, 8433, 8638, 8296, 8078}   # ≤ 12 % de periodos sin casos (calculado en el paso 1)
 
 
 def ensamble(Xtr, ytr, Xs):

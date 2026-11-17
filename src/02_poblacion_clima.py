@@ -11,7 +11,7 @@ Entradas (datos/crudos/):
 Salidas (datos/procesados/):
   clima_mun_periodo.csv   anio, periodo, cod_mun, lluvia_mm, temp_media, humedad_media, dias,
                           lluvia_anomalia  (lluvia del periodo − promedio de ese periodo en los años
-                          de ENTRENAMIENTO, por municipio; ver BITACORA "años de pandemia")
+                          de ENTRENAMIENTO, por municipio; 2020 no entra por la pandemia)
   panel_base.csv          casos + población + incidencia por 100 mil + clima, 2.392 filas
 
 Uso: python src/02_poblacion_clima.py

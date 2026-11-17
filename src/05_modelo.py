@@ -136,7 +136,7 @@ def main():
     b = ps[ps.modelo == "Red sin grafo"].set_index("semilla")
     for k in ("prueba_AUC_PR", "prueba_AUC_ROC", "prueba_F2"):
         dif = a[k] - b[k]
-        print(f"{k}: con − sin grafo = {dif.mean():+.3f} ± {dif.std():.3f} "
+        print(f"{k}: con - sin grafo = {dif.mean():+.3f} ± {dif.std():.3f} "
               f"(gana con grafo en {int((dif > 0).sum())}/{len(dif)} semillas)")
 
 

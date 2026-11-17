@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+datos/crudos/xlsx/
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.synctex.gz

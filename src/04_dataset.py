@@ -20,7 +20,7 @@ Variables de entrada (todas conocidas al final del periodo t):
 
 División temporal (por el año del periodo OBJETIVO):
     entrenamiento 2018, 2019, 2021, 2022, 2023 | validación 2024 | prueba 2025
-    Filas cuyo objetivo cae en 2020 se excluyen (decisión "años de pandemia", opción B).
+    Filas cuyo objetivo cae en 2020 se excluyen (subregistro por la pandemia de COVID-19).
     Los rezagos se calculan sobre la serie completa ANTES de excluir 2020.
 """
 from pathlib import Path

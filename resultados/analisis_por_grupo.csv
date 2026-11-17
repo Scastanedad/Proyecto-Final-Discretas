@@ -1,0 +1,4 @@
+grupo,filas,brotes,AUC_ROC sin grafo,AUC_PR sin grafo,AUC_ROC con grafo,AUC_PR con grafo
+densos (6),78,36,0.893,0.879,0.887,0.871
+escasos (17),221,64,0.833,0.666,0.827,0.665
+todos (23),299,100,0.856,0.754,0.851,0.75
